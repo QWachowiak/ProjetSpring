@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Ville;
+import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateurInvalideException;
+import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateursServices;
 import fr.sgr.formation.voteapp.utilisateurs.services.VilleService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,6 +23,8 @@ public class Initialisation {
 
 	@Autowired
 	private VilleService villeService;
+	@Autowired
+	private UtilisateursServices utilServ;
 
 	@PostConstruct
 	@Transactional(propagation = Propagation.REQUIRED)
@@ -30,6 +35,18 @@ public class Initialisation {
 		rennes.setNom("Rennes");
 
 		villeService.creer(rennes);
+
+		Utilisateur user = new Utilisateur();
+		user.setLogin("12");
+		user.setNom("Michel");
+		user.setPrenom("Philippe");
+		user.setMotDePasse("jesuis12");
+		try {
+			utilServ.creer(user);
+		} catch (UtilisateurInvalideException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
