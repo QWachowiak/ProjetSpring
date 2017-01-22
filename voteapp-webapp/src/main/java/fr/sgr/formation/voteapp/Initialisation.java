@@ -36,6 +36,18 @@ public class Initialisation {
 
 		villeService.creer(rennes);
 
+		Utilisateur user2 = new Utilisateur();
+		user2.setLogin("1");
+		user2.setNom("Marcus");
+		user2.setPrenom("Jasper");
+		user2.setMotDePasse("jasper");
+		try {
+			utilServ.creer(user2);
+		} catch (UtilisateurInvalideException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		Utilisateur user = new Utilisateur();
 		user.setLogin("12");
 		user.setNom("Michel");

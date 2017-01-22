@@ -48,4 +48,5 @@ public class UtilisateursRest {
 	public DescriptionErreur gestionErreur(UtilisateurInvalideException exception) {
 		return new DescriptionErreur(exception.getErreur().name(), exception.getErreur().getMessage());
 	}
+
 }
