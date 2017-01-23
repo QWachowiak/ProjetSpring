@@ -1,7 +1,7 @@
 package fr.sgr.formation.voteapp;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -47,7 +47,7 @@ public class Initialisation {
 		user2.setNom("AdminNom");
 		user2.setPrenom("AdminPrenom");
 		user2.setMotDePasse("admin");
-		List<ProfilsUtilisateur> profils = new ArrayList<ProfilsUtilisateur>();
+		Set<ProfilsUtilisateur> profils = new HashSet<ProfilsUtilisateur>();
 		profils.add(ProfilsUtilisateur.ADMINISTRATEUR);
 		user2.setProfils(profils);
 		try {

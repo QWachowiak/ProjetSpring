@@ -132,34 +132,38 @@ public class UtilisateursServices {
 		}
 
 		/** Mise à jour de tous les champs renseignés dans la requête. */
-		if (!modifications.getPrenom().equals(utilisateurAModifier.getPrenom())) {
+		if (!utilisateurAModifier.getPrenom().equals(modifications.getPrenom())) {
 			utilisateurAModifier.setPrenom(modifications.getPrenom());
 		}
-		if (!modifications.getNom().equals(utilisateurAModifier.getNom())) {
+		if (!utilisateurAModifier.getNom().equals(modifications.getNom())) {
 			utilisateurAModifier.setNom(modifications.getNom());
 		}
-		if (!modifications.getEmail().equals(utilisateurAModifier.getEmail())) {
+		if (!utilisateurAModifier.getEmail().equals(modifications.getEmail())) {
 			utilisateurAModifier.setEmail(modifications.getEmail());
 		}
-		if (!modifications.getMotDePasse().equals(utilisateurAModifier.getMotDePasse())) {
+		if (!utilisateurAModifier.getMotDePasse().equals(modifications.getMotDePasse())) {
 			utilisateurAModifier.setMotDePasse(modifications.getMotDePasse());
 		}
-		if (!modifications.getDateDeNaissance().equals(utilisateurAModifier.getDateDeNaissance())) {
+		if (utilisateurAModifier.getDateDeNaissance() == null ? modifications.getDateDeNaissance() != null
+				: !utilisateurAModifier.getDateDeNaissance().equals(modifications.getDateDeNaissance())) {
 			utilisateurAModifier.setDateDeNaissance(modifications.getDateDeNaissance());
 		}
-		if (!modifications.getAdresse().equals(utilisateurAModifier.getAdresse())) {
+		if (utilisateurAModifier.getAdresse() == null ? modifications.getAdresse() != null
+				: !utilisateurAModifier.getAdresse().equals(modifications.getAdresse())) {
 			utilisateurAModifier.setAdresse(modifications.getAdresse());
 		}
 
 		/** Mise à jour des champs uniquement possible pour l'administrateur. */
-		if (!modifications.getImage().equals(utilisateurAModifier.getAdresse())) {
+		if (utilisateurAModifier.getImage() == null ? modifications.getImage() != null
+				: !utilisateurAModifier.getImage().equals(modifications.getImage())) {
 			if (modifiant.getProfils().contains(ProfilsUtilisateur.ADMINISTRATEUR)) {
 				utilisateurAModifier.setImage(modifications.getImage());
 			} else {
 				throw new DroitAccesException(ErreurDroits.ACCES_ADMINISTRATEUR);
 			}
 		}
-		if (!modifications.getProfils().equals(utilisateurAModifier.getProfils())) {
+		if (utilisateurAModifier.getProfils() == null ? modifications.getProfils() != null
+				: !utilisateurAModifier.getProfils().equals(modifications.getProfils())) {
 			if (modifiant.getProfils().contains(ProfilsUtilisateur.ADMINISTRATEUR)) {
 				utilisateurAModifier.setProfils(modifications.getProfils());
 			} else {
