@@ -26,8 +26,9 @@ public class UtilisateursRest {
 	@RequestMapping(method = RequestMethod.PUT)
 	public void creer(@PathVariable String login, @RequestBody Utilisateur utilisateur)
 			throws UtilisateurInvalideException, DroitAccesException {
-		log.info("=====> Création ou modification de l'utilisateur de login {}: {}.", login, utilisateur);
-	//	utilisateursServices.creer(utilisateursServices.rechercherParLogin(login), utilisateur);
+		log.info("=====> Création ou modification de l'utilisateur de login {} (admin : {}).", utilisateur.getLogin(),
+				login);
+		utilisateursServices.creer(utilisateursServices.rechercherParLogin(login), utilisateur);
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE)
