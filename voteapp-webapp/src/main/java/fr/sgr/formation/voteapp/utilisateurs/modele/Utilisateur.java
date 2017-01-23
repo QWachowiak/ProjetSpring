@@ -1,7 +1,7 @@
 package fr.sgr.formation.voteapp.utilisateurs.modele;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;
@@ -43,7 +43,7 @@ public class Utilisateur {
 	@CollectionTable(name = "profilsUtilisateurs", joinColumns = @JoinColumn(name = "loginUtilisateur") )
 	@Enumerated(EnumType.STRING)
 	@Singular
-	private List<ProfilsUtilisateur> profils;
+	private Set<ProfilsUtilisateur> profils;
 
 	@Embedded
 	private Adresse adresse;

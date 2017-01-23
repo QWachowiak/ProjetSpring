@@ -1,5 +1,8 @@
 package fr.sgr.formation.voteapp.utilisateurs.ws;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -38,10 +41,11 @@ public class UtilisateursRest {
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
-	public Utilisateur lire(@PathVariable String login) {
+	public List<Utilisateur> lire(@PathVariable String login) {
 		log.info("=====> Récupération de l'utilisateur de login {}.", login);
-
-		return utilisateursServices.rechercherParLogin(login);
+		List<Utilisateur> listeCorrespondante = new ArrayList<Utilisateur>();
+		listeCorrespondante.add(utilisateursServices.rechercherParLogin(login));
+		return listeCorrespondante;
 	}
 
 	@ExceptionHandler({ UtilisateurInvalideException.class })
