@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
+import fr.sgr.formation.voteapp.utilisateurs.services.DroitAccesException;
 import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateurInvalideException;
 import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateursServices;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +25,9 @@ public class UtilisateursRest {
 
 	@RequestMapping(method = RequestMethod.PUT)
 	public void creer(@PathVariable String login, @RequestBody Utilisateur utilisateur)
-			throws UtilisateurInvalideException {
+			throws UtilisateurInvalideException, DroitAccesException {
 		log.info("=====> Création ou modification de l'utilisateur de login {}: {}.", login, utilisateur);
-		utilisateur.setLogin(login);
-		utilisateursServices.creer(utilisateur);
+	//	utilisateursServices.creer(utilisateursServices.rechercherParLogin(login), utilisateur);
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE)
@@ -45,7 +45,13 @@ public class UtilisateursRest {
 
 	@ExceptionHandler({ UtilisateurInvalideException.class })
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	public DescriptionErreur gestionErreur(UtilisateurInvalideException exception) {
+	public DescriptionErreur gestionErreurUtilisateurInvalide(UtilisateurInvalideException exception) {
+		return new DescriptionErreur(exception.getErreur().name(), exception.getErreur().getMessage());
+	}
+
+	@ExceptionHandler({ DroitAccesException.class })
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+	public DescriptionErreur gestionErreurDroitAcces(DroitAccesException exception) {
 		return new DescriptionErreur(exception.getErreur().name(), exception.getErreur().getMessage());
 	}
 

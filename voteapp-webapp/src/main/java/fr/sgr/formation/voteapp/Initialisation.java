@@ -1,5 +1,8 @@
 package fr.sgr.formation.voteapp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.sgr.formation.voteapp.utilisateurs.modele.ProfilsUtilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Ville;
+import fr.sgr.formation.voteapp.utilisateurs.services.DroitAccesException;
 import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateurInvalideException;
 import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateursServices;
 import fr.sgr.formation.voteapp.utilisateurs.services.VilleService;
@@ -36,26 +41,37 @@ public class Initialisation {
 
 		villeService.creer(rennes);
 
+		// Création du premier admin
 		Utilisateur user2 = new Utilisateur();
-		user2.setLogin("1");
-		user2.setNom("Marcus");
-		user2.setPrenom("Jasper");
-		user2.setMotDePasse("jasper");
+		user2.setLogin("admin");
+		user2.setNom("AdminNom");
+		user2.setPrenom("AdminPrenom");
+		user2.setMotDePasse("admin");
+		List<ProfilsUtilisateur> profils = new ArrayList<ProfilsUtilisateur>();
+		profils.add(ProfilsUtilisateur.ADMINISTRATEUR);
+		user2.setProfils(profils);
 		try {
-			utilServ.creer(user2);
+			utilServ.creer(user2, user2);
 		} catch (UtilisateurInvalideException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DroitAccesException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
+		// Création d'un utilisateur non admin
 		Utilisateur user = new Utilisateur();
 		user.setLogin("12");
 		user.setNom("Michel");
 		user.setPrenom("Philippe");
 		user.setMotDePasse("jesuis12");
 		try {
-			utilServ.creer(user);
+			utilServ.creer(user2, user);
 		} catch (UtilisateurInvalideException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DroitAccesException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

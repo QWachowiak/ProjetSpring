@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.sgr.formation.voteapp.notifications.services.NotificationsServices;
+import fr.sgr.formation.voteapp.utilisateurs.modele.ProfilsUtilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
+import fr.sgr.formation.voteapp.utilisateurs.services.DroitAccesException.ErreurDroits;
 import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateurInvalideException.ErreurUtilisateur;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,17 +47,23 @@ public class UtilisateursServices {
 	 * @return Utilisateur créé.
 	 * @throws UtilisateurInvalideException
 	 *             Levée si l'utilisateur est invalide.
+	 * @throws DroitAccesException
+	 *             Levée si l'utilisateur n'a pas les bons droits d'accès à
+	 *             cette commande.
 	 */
 	@Transactional(propagation = Propagation.REQUIRED)
-	public Utilisateur creer(Utilisateur utilisateur) throws UtilisateurInvalideException {
-		log.info("=====> Création de l'utilisateur : {}.", utilisateur);
+	public Utilisateur creer(Utilisateur createur, Utilisateur nouvelUtilisateur)
+			throws UtilisateurInvalideException, DroitAccesException {
+		if (!createur.getProfils().contains(ProfilsUtilisateur.ADMINISTRATEUR)) {
+			throw new DroitAccesException(ErreurDroits.ACCES_ADMINISTRATEUR);
+		}
 
-		if (utilisateur == null) {
+		if (nouvelUtilisateur == null) {
 			throw new UtilisateurInvalideException(ErreurUtilisateur.UTILISATEUR_OBLIGATOIRE);
 		}
 
 		/** Validation de l'existance de l'utilisateur. */
-		if (rechercherParLogin(utilisateur.getLogin()) != null) {
+		if (rechercherParLogin(nouvelUtilisateur.getLogin()) != null) {
 			throw new UtilisateurInvalideException(ErreurUtilisateur.UTILISATEUR_EXISTANT);
 		}
 
@@ -63,15 +71,16 @@ public class UtilisateursServices {
 		 * Validation de l'utilisateur: lève une exception si l'utilisateur est
 		 * invalide.
 		 */
-		validationServices.validerUtilisateur(utilisateur);
+		validationServices.validerUtilisateur(nouvelUtilisateur);
 
 		/** Notification de l'événement de création */
-		notificationsServices.notifier("Création de l'utilisateur: " + utilisateur.toString());
+		notificationsServices.notifier("Création de l'utilisateur: " + nouvelUtilisateur.toString());
 
 		/** Persistance de l'utilisateur. */
-		entityManager.persist(utilisateur);
+		entityManager.persist(nouvelUtilisateur);
+		log.info("=====> Création de l'utilisateur : {}.", nouvelUtilisateur);
 
-		return utilisateur;
+		return nouvelUtilisateur;
 	}
 
 	/**

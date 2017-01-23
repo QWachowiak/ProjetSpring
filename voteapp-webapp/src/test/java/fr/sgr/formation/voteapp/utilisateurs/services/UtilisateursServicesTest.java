@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import fr.sgr.formation.voteapp.notifications.services.NotificationsServices;
+import fr.sgr.formation.voteapp.utilisateurs.modele.ProfilsUtilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateurInvalideException.ErreurUtilisateur;
 
@@ -30,16 +31,23 @@ public class UtilisateursServicesTest {
 	@Mock
 	private EntityManager entityManager;
 
+	@Mock
+	private Utilisateur admin;
+
 	@Test
 	public void creerUtilisateurNul() {
 		try {
+			admin.getProfils().add(ProfilsUtilisateur.ADMINISTRATEUR);
 			/** When: Lorsqu'on appel le service de création */
-			services.creer(null);
+			services.creer(admin, null);
 
 			fail("Une exception devrait être levée.");
 		} catch (UtilisateurInvalideException e) {
 			/** Then: Alors une exception est levée. */
 			Assert.assertEquals(UtilisateurInvalideException.ErreurUtilisateur.UTILISATEUR_OBLIGATOIRE, e.getErreur());
+		} catch (DroitAccesException e) {
+			// TODO Auto-generated catch block
+			fail("Une exception d'utilisateur invalide devrait être levée.");
 		}
 	}
 

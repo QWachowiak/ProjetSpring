@@ -37,6 +37,7 @@ public class Utilisateur {
 	@Temporal(TemporalType.DATE)
 	private Date dateDeNaissance;
 	private String email;
+	private String image;
 
 	@ElementCollection(targetClass = ProfilsUtilisateur.class)
 	@CollectionTable(name = "profilsUtilisateurs", joinColumns = @JoinColumn(name = "loginUtilisateur") )
