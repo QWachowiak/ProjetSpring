@@ -1,6 +1,9 @@
 package fr.sgr.formation.voteapp.utilisateurs.services;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.sgr.formation.voteapp.notifications.services.NotificationsServices;
 import fr.sgr.formation.voteapp.utilisateurs.modele.ProfilsUtilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
+import fr.sgr.formation.voteapp.utilisateurs.modele.Ville;
 import fr.sgr.formation.voteapp.utilisateurs.services.DroitAccesException.ErreurDroits;
 import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateurInvalideException.ErreurUtilisateur;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +39,9 @@ public class UtilisateursServices {
 	/** Services de notification des événements. */
 	@Autowired
 	private NotificationsServices notificationsServices;
+	/** Services de gestion des villes. */
+	@Autowired
+	private VilleService villeServices;
 
 	@Autowired
 	private EntityManager entityManager;
@@ -84,6 +91,14 @@ public class UtilisateursServices {
 		/** Validation de l'existence de l'utilisateur. */
 		if (rechercherParLogin(nouvelUtilisateur.getLogin()) != null) {
 			throw new UtilisateurInvalideException(ErreurUtilisateur.UTILISATEUR_EXISTANT);
+		}
+
+		/**
+		 * Vérification (et éventuellement création) de la présence de la ville
+		 * dans le système
+		 */
+		if (nouvelUtilisateur.getAdresse() != null) {
+			villeServices.update(nouvelUtilisateur.getAdresse().getVille());
 		}
 
 		/**
@@ -148,9 +163,19 @@ public class UtilisateursServices {
 				: !utilisateurAModifier.getDateDeNaissance().equals(modifications.getDateDeNaissance())) {
 			utilisateurAModifier.setDateDeNaissance(modifications.getDateDeNaissance());
 		}
-		if (utilisateurAModifier.getAdresse() == null ? modifications.getAdresse() != null
-				: !utilisateurAModifier.getAdresse().equals(modifications.getAdresse())) {
-			utilisateurAModifier.setAdresse(modifications.getAdresse());
+
+		if (utilisateurAModifier.getAdresse() == null) {
+			if (modifications.getAdresse() != null) {
+				villeServices.update(modifications.getAdresse().getVille());
+				utilisateurAModifier.setAdresse(modifications.getAdresse());
+			}
+		} else {
+			if (!utilisateurAModifier.getAdresse().equals(modifications.getAdresse())) {
+				if (modifications.getAdresse() != null) {
+					villeServices.update(modifications.getAdresse().getVille());
+				}
+				utilisateurAModifier.setAdresse(modifications.getAdresse());
+			}
 		}
 
 		/** Mise à jour des champs uniquement possible pour l'administrateur. */
@@ -198,6 +223,41 @@ public class UtilisateursServices {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Permet de rechercher des utilisateurs en fonction de plusieurs critères
+	 * facultatifs.
+	 * 
+	 * @param prenom
+	 *            Critère de recherche pouvant être null.
+	 * @param nom
+	 *            Critère de recherche pouvant être null.
+	 * @param ville
+	 *            Critère de recherche pouvant être null.
+	 * @param profil
+	 *            Critère de recherche pouvant être null.
+	 * @param page
+	 *            Numéro de la page demandée.
+	 * @param nombreItems
+	 *            Nombre d'items demandés.
+	 * @return Une page de la liste des utilisateurs correspondant aux critères
+	 * @throws DroitAccesException
+	 */
+	public List<Utilisateur> afficherPage(Utilisateur demandeur, String prenom, String nom, Ville ville,
+			ProfilsUtilisateur profil, int page,
+			int nombreItems) throws DroitAccesException {
+		if (!demandeur.getProfils().contains(ProfilsUtilisateur.ADMINISTRATEUR)) {
+			throw new DroitAccesException(ErreurDroits.ACCES_ADMINISTRATEUR);
+		}
+
+		/**
+		 * A faire
+		 */
+
+		// Exemple pour dire comment on renvoie tous les utilisateurs
+		Query query = entityManager.createQuery("SELECT * FROM Utilisateurs");
+		return (List<Utilisateur>) query.getResultList();
 	}
 
 }
