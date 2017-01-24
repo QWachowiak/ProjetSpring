@@ -1,6 +1,6 @@
 package fr.sgr.formation.voteapp.utilisateurs.modele;
 
-import java.util.Date;
+import java.util.Calendar;
 import java.util.Set;
 
 import javax.persistence.CollectionTable;
@@ -35,7 +35,7 @@ public class Utilisateur {
 	private String prenom;
 	private String motDePasse;
 	@Temporal(TemporalType.DATE)
-	private Date dateDeNaissance;
+	private Calendar dateDeNaissance;
 	private String email;
 	private String image;
 

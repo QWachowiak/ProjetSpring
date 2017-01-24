@@ -15,8 +15,20 @@ public class VilleService {
 	private EntityManager entityManager;
 
 	@Transactional(propagation = Propagation.REQUIRED)
+	public void update(Ville ville) {
+		if (ville != null) {
+			/** Vérification de l'existence de l'utilisateur. */
+			if (entityManager.find(Ville.class, ville.getId()) == null) {
+				creer(ville);
+			} else {
+				// modifier();
+			}
+		}
+	}
+
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void creer(Ville ville) {
 		entityManager.persist(ville);
 	}
+
 }
-// Matthias est passé par ici

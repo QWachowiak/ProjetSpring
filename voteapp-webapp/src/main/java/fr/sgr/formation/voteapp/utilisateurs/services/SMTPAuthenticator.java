@@ -1,4 +1,4 @@
-package fr.sgr.formation.voteapp.email.services;
+package fr.sgr.formation.voteapp.utilisateurs.services;
 
 import javax.mail.PasswordAuthentication;
 

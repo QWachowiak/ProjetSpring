@@ -1,5 +1,6 @@
 package fr.sgr.formation.voteapp;
 
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.sgr.formation.voteapp.utilisateurs.modele.Adresse;
 import fr.sgr.formation.voteapp.utilisateurs.modele.ProfilsUtilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Ville;
@@ -42,16 +44,17 @@ public class Initialisation {
 		villeService.creer(rennes);
 
 		// Création du premier admin
-		Utilisateur user2 = new Utilisateur();
-		user2.setLogin("admin");
-		user2.setNom("AdminNom");
-		user2.setPrenom("AdminPrenom");
-		user2.setMotDePasse("admin");
+		Utilisateur admin = new Utilisateur();
+		admin.setLogin("admin");
+		admin.setNom("AdminNom");
+		admin.setPrenom("AdminPrenom");
+		admin.setMotDePasse("admin");
+		admin.setEmail("quentin.wachowiak@wanadoo.fr");
 		Set<ProfilsUtilisateur> profils = new HashSet<ProfilsUtilisateur>();
 		profils.add(ProfilsUtilisateur.ADMINISTRATEUR);
-		user2.setProfils(profils);
+		admin.setProfils(profils);
 		try {
-			utilServ.creer(user2, user2);
+			utilServ.creer(admin, admin);
 		} catch (UtilisateurInvalideException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -66,8 +69,20 @@ public class Initialisation {
 		user.setNom("Michel");
 		user.setPrenom("Philippe");
 		user.setMotDePasse("jesuis12");
+		user.setEmail("user.email@server");
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(1992, 12, 31);
+		user.setDateDeNaissance(calendar);
+		Adresse adresse = new Adresse();
+		adresse.setRue("Rue machin truc");
+		adresse.setVille(rennes);
+		user.setAdresse(adresse);
+		Set<ProfilsUtilisateur> profilsUser = new HashSet<ProfilsUtilisateur>();
+		profilsUser.add(ProfilsUtilisateur.ADMINISTRATEUR);
+		profilsUser.add(ProfilsUtilisateur.UTILISATEUR);
+		user.setProfils(profilsUser);
 		try {
-			utilServ.creer(user2, user);
+			utilServ.creer(admin, user);
 		} catch (UtilisateurInvalideException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

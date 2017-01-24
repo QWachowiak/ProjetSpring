@@ -81,7 +81,7 @@ public class UtilisateursServices {
 			throw new UtilisateurInvalideException(ErreurUtilisateur.UTILISATEUR_OBLIGATOIRE);
 		}
 
-		/** Validation de l'existance de l'utilisateur. */
+		/** Validation de l'existence de l'utilisateur. */
 		if (rechercherParLogin(nouvelUtilisateur.getLogin()) != null) {
 			throw new UtilisateurInvalideException(ErreurUtilisateur.UTILISATEUR_EXISTANT);
 		}

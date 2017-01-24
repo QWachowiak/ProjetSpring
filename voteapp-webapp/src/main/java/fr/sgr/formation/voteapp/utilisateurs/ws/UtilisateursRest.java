@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.services.DroitAccesException;
+import fr.sgr.formation.voteapp.utilisateurs.services.EmailServices;
 import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateurInvalideException;
 import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateursServices;
+import fr.sgr.formation.voteapp.utilisateurs.services.VilleService;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -26,12 +28,20 @@ public class UtilisateursRest {
 	@Autowired
 	private UtilisateursServices utilisateursServices;
 
+	@Autowired
+	private EmailServices emailServices;
+
+	@Autowired
+	private VilleService villeServices;
+
 	@RequestMapping(method = RequestMethod.PUT)
 	public void update(@PathVariable String login, @RequestBody Utilisateur utilisateur)
 			throws UtilisateurInvalideException, DroitAccesException {
 		log.info("=====> Création ou modification de l'utilisateur de login {} (admin : {}).", utilisateur.getLogin(),
 				login);
-		utilisateursServices.update(utilisateursServices.rechercherParLogin(login), utilisateur);
+		// utilisateursServices.update(utilisateursServices.rechercherParLogin(login),
+		// utilisateur);
+		villeServices.update(utilisateur.getAdresse().getVille());
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE)
@@ -46,6 +56,20 @@ public class UtilisateursRest {
 		List<Utilisateur> listeCorrespondante = new ArrayList<Utilisateur>();
 		listeCorrespondante.add(utilisateursServices.rechercherParLogin(login));
 		return listeCorrespondante;
+	}
+
+	@RequestMapping(value = "/motDePasse", method = RequestMethod.GET)
+	public void renouvellerMotdePasse(@PathVariable String login) throws Exception {
+		log.info("=====> Envoi d'un nouveau mot de passe par mail à l'utilisateur de login : {}.", login);
+		String nouveauMdp = emailServices.genererMotDePasse();
+		utilisateursServices.rechercherParLogin(login).setMotDePasse(nouveauMdp);
+		emailServices.renouvellerMotDePasse(utilisateursServices.rechercherParLogin(login), nouveauMdp);
+	}
+
+	@ExceptionHandler({ Exception.class })
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+	public DescriptionErreur gestionErreur(Exception exception) {
+		return new DescriptionErreur("erreur", exception.getMessage());
 	}
 
 	@ExceptionHandler({ UtilisateurInvalideException.class })
