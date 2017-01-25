@@ -82,7 +82,7 @@ public class UtilisateursServices {
 	@Transactional(propagation = Propagation.REQUIRED)
 	public Utilisateur creer(Utilisateur createur, Utilisateur nouvelUtilisateur)
 			throws UtilisateurInvalideException, DroitAccesException {
-		/** On commence par créer la trace de l'appel de cette méthode. */
+		/** On commence par indiquer qu'une tentative de création a lieu. */
 		Trace trace = tracesServices.init(createur, TypeAction.USR_CREATION);
 
 		if (!createur.getProfils().contains(ProfilsUtilisateur.ADMINISTRATEUR)) {
@@ -113,8 +113,7 @@ public class UtilisateursServices {
 		validationServices.validerUtilisateur(nouvelUtilisateur);
 
 		/**
-		 * On enregistre la trace en indiquant que l'événement s'est
-		 * correctement réalisé.
+		 * On indique dans la trace que la création s'est correctement réalisée.
 		 */
 		trace.setResultat("Création OK");
 		trace.setDescription("Création de l'utilisateur de login " + nouvelUtilisateur.getLogin()
@@ -146,6 +145,8 @@ public class UtilisateursServices {
 	@Transactional(propagation = Propagation.REQUIRED)
 	public Utilisateur modifier(Utilisateur modifiant, Utilisateur utilisateurAModifier, Utilisateur modifications)
 			throws UtilisateurInvalideException, DroitAccesException {
+		/** On commence par indiquer qu'une tentative de modification a lieu. */
+		Trace trace = tracesServices.init(modifiant, TypeAction.USR_MODIF);
 
 		/**
 		 * On vérifie d'abord qu'un utilisateur non-admin ne cherche pas à
@@ -212,8 +213,13 @@ public class UtilisateursServices {
 		 */
 		validationServices.validerUtilisateur(utilisateurAModifier);
 
-		/** Notification de l'événement de création */
-		// tracesServices
+		/**
+		 * On indique dans la trace que la modification s'est correctement
+		 * réalisée.
+		 */
+		trace.setResultat("Modification OK");
+		trace.setDescription("Modification du profil de l'utilisateur de login " + utilisateurAModifier.getLogin()
+				+ " par l'administrateur de login " + modifiant.getLogin());
 
 		return utilisateurAModifier;
 	}
@@ -257,6 +263,12 @@ public class UtilisateursServices {
 	public List<Utilisateur> afficherPage(Utilisateur demandeur, String prenom, String nom, Ville ville,
 			ProfilsUtilisateur profil, int page,
 			int nombreItems) throws DroitAccesException {
+		/**
+		 * On commence par indiquer qu'une tentative d'affichage des
+		 * utilisateurs a lieu.
+		 */
+		Trace trace = tracesServices.init(demandeur, TypeAction.USR_LISTE);
+
 		if (!demandeur.getProfils().contains(ProfilsUtilisateur.ADMINISTRATEUR)) {
 			throw new DroitAccesException(ErreurDroits.ACCES_ADMINISTRATEUR);
 		}
@@ -267,6 +279,16 @@ public class UtilisateursServices {
 
 		// Exemple pour dire comment on renvoie tous les utilisateurs
 		Query query = entityManager.createQuery("SELECT * FROM Utilisateurs");
+
+		/**
+		 * On indique dans la trace que la récupération de la liste s'est
+		 * correctement réalisée.
+		 */
+		trace.setResultat("Liste des utilisateurs OK");
+		trace.setDescription(
+				"Affichage de la liste des utilisateurs par l'utilisateur : "
+						+ demandeur.getLogin());
+
 		return (List<Utilisateur>) query.getResultList();
 	}
 

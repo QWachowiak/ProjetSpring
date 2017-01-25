@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.sgr.formation.voteapp.traces.modele.Trace;
 import fr.sgr.formation.voteapp.traces.modele.TypeAction;
 import fr.sgr.formation.voteapp.traces.services.TracesServices;
 import fr.sgr.formation.voteapp.utilisateurs.modele.ProfilsUtilisateur;
@@ -65,9 +66,13 @@ public class UtilisateursRest {
 	@RequestMapping(value = "/motDePasse", method = RequestMethod.GET)
 	public void renouvellerMotdePasse(@PathVariable String login) throws Exception {
 		log.info("=====> Envoi d'un nouveau mot de passe par mail à l'utilisateur de login : {}.", login);
+		Trace trace = tracesServices.init(utilisateursServices.rechercherParLogin(login), TypeAction.USR_RENOUVMDP);
 		String nouveauMdp = emailServices.genererMotDePasse();
 		utilisateursServices.rechercherParLogin(login).setMotDePasse(nouveauMdp);
 		emailServices.renouvellerMotDePasse(utilisateursServices.rechercherParLogin(login), nouveauMdp);
+
+		/** Si l'email est passé, on met à jour la trace. */
+		trace.setResultat("Renouvellement de mot de passe OK");
 	}
 
 	@RequestMapping(value = "/liste", method = RequestMethod.GET)

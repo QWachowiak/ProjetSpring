@@ -33,5 +33,5 @@ public class Trace {
 	String resultat;
 	String description;
 	@ManyToOne
-	Utilisateur proprietaire;
+	Utilisateur utilisateurOrigine;
 }
