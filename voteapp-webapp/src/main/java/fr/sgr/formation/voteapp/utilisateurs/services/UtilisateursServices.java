@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.sgr.formation.voteapp.notifications.services.NotificationsServices;
+import fr.sgr.formation.voteapp.traces.modele.Trace;
+import fr.sgr.formation.voteapp.traces.modele.TypeAction;
+import fr.sgr.formation.voteapp.traces.services.TracesServices;
 import fr.sgr.formation.voteapp.utilisateurs.modele.ProfilsUtilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Ville;
@@ -38,7 +40,7 @@ public class UtilisateursServices {
 	private ValidationUtilisateurServices validationServices;
 	/** Services de notification des événements. */
 	@Autowired
-	private NotificationsServices notificationsServices;
+	private TracesServices tracesServices;
 	/** Services de gestion des villes. */
 	@Autowired
 	private VilleService villeServices;
@@ -80,6 +82,9 @@ public class UtilisateursServices {
 	@Transactional(propagation = Propagation.REQUIRED)
 	public Utilisateur creer(Utilisateur createur, Utilisateur nouvelUtilisateur)
 			throws UtilisateurInvalideException, DroitAccesException {
+		/** On commence par créer la trace de l'appel de cette méthode. */
+		Trace trace = tracesServices.init(createur, TypeAction.USR_CREATION);
+
 		if (!createur.getProfils().contains(ProfilsUtilisateur.ADMINISTRATEUR)) {
 			throw new DroitAccesException(ErreurDroits.ACCES_ADMINISTRATEUR);
 		}
@@ -107,8 +112,13 @@ public class UtilisateursServices {
 		 */
 		validationServices.validerUtilisateur(nouvelUtilisateur);
 
-		/** Notification de l'événement de création */
-		notificationsServices.notifier("Création de l'utilisateur: " + nouvelUtilisateur.toString());
+		/**
+		 * On enregistre la trace en indiquant que l'événement s'est
+		 * correctement réalisé.
+		 */
+		trace.setResultat("Création OK");
+		trace.setDescription("Création de l'utilisateur de login " + nouvelUtilisateur.getLogin()
+				+ " par l'administrateur de login " + createur.getLogin());
 
 		/** Persistance de l'utilisateur. */
 		entityManager.persist(nouvelUtilisateur);
@@ -203,7 +213,7 @@ public class UtilisateursServices {
 		validationServices.validerUtilisateur(utilisateurAModifier);
 
 		/** Notification de l'événement de création */
-		notificationsServices.notifier("Modification de l'utilisateur: " + utilisateurAModifier.getLogin());
+		// tracesServices
 
 		return utilisateurAModifier;
 	}

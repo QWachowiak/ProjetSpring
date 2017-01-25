@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.sgr.formation.voteapp.traces.modele.TypeAction;
+import fr.sgr.formation.voteapp.traces.services.TracesServices;
 import fr.sgr.formation.voteapp.utilisateurs.modele.ProfilsUtilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.services.DroitAccesException;
@@ -35,6 +37,9 @@ public class UtilisateursRest {
 	@Autowired
 	private VilleService villeServices;
 
+	@Autowired
+	private TracesServices tracesServices;
+
 	@RequestMapping(method = RequestMethod.PUT)
 	public void update(@PathVariable String login, @RequestBody Utilisateur utilisateur)
 			throws UtilisateurInvalideException, DroitAccesException {
@@ -53,6 +58,7 @@ public class UtilisateursRest {
 	@RequestMapping(method = RequestMethod.GET)
 	public Utilisateur lire(@PathVariable String login) {
 		log.info("=====> Récupération de l'utilisateur de login {}.", login);
+		tracesServices.init(utilisateursServices.rechercherParLogin(login), TypeAction.USR_CONSULT);
 		return utilisateursServices.rechercherParLogin(login);
 	}
 
