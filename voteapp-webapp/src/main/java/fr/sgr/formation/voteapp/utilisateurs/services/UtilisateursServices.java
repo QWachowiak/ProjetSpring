@@ -127,6 +127,29 @@ public class UtilisateursServices {
 	}
 
 	/**
+	 * Supprime un utilisateur sur demande d'un administrateur
+	 * 
+	 * @param suppresseur
+	 * @param utilisateurSupprime
+	 * @throws DroitAccesException
+	 */
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void supprimer(Utilisateur suppresseur, Utilisateur utilisateurSupprime) throws DroitAccesException {
+
+		if (!suppresseur.getProfils().contains(ProfilsUtilisateur.ADMINISTRATEUR)) {
+			throw new DroitAccesException(ErreurDroits.ACCES_ADMINISTRATEUR);
+		}
+
+		log.info("=====> Suppression de l'utilisateur de login {}.", utilisateurSupprime.getLogin());
+		entityManager.detach(utilisateurSupprime);
+		/*
+		 * Remarque: quand une instance d'Utilisateur est detach l'opération se
+		 * fait en cascade sur les éventuelle entity qui sont des attributs de
+		 * l'Utilisateur
+		 */
+	}
+
+	/**
 	 * Modifie un utilisateur déjà présent dans le système.
 	 * 
 	 * @param modifiant
@@ -278,7 +301,7 @@ public class UtilisateursServices {
 		 * retournés sur différents critères: Nom (recherche du type
 		 * "contient"), Prénom (recherche du type "contient"), Ville, Profil.
 		 */
-		log.info("=====> avant la query");
+		log.info("=====> Consultation d'une liste d'utilisateurs");
 		Query query = entityManager.createQuery(
 				"SELECT u FROM Utilisateur u ");
 		/*
@@ -319,7 +342,6 @@ public class UtilisateursServices {
 				"Affichage de la liste des utilisateurs par l'utilisateur : "
 						+ demandeur.getLogin());
 
-		log.info("=====> avant le return");
 		return res;
 	}
 

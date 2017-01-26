@@ -51,9 +51,11 @@ public class UtilisateursRest {
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE)
-	public void supprimer(@PathVariable String login) {
+	public void supprimer(@PathVariable String loginSuppresseur, @RequestParam(value = "login") String login)
+			throws DroitAccesException {
 		log.info("=====> Suppression de l'utilisateur de login {}.", login);
-
+		utilisateursServices.supprimer(utilisateursServices.rechercherParLogin(loginSuppresseur),
+				utilisateursServices.rechercherParLogin(login));
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
