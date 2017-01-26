@@ -274,18 +274,39 @@ public class UtilisateursServices {
 		}
 
 		/**
-		 * A faire L'utilisateur doit pouvoir filtrer la liste des utilisateurs
+		 * L'utilisateur doit pouvoir filtrer la liste des utilisateurs
 		 * retournés sur différents critères: Nom (recherche du type
 		 * "contient"), Prénom (recherche du type "contient"), Ville, Profil.
 		 */
 		log.info("=====> avant la query");
 		Query query = entityManager.createQuery(
 				"SELECT u FROM Utilisateur u ");
-
+		/*
+		 * Etant donné que jpql utilise les noms des classes java mappées
+		 * comme @Entity les jointures son malaisées, on trie les résultats de
+		 * la requête globale avec java
+		 */
 		List<Utilisateur> res = (List<Utilisateur>) query.getResultList();
 		for (Utilisateur u : res) {
-			if (!u.getNom().contains(nom)) {
-
+			if (nom != null) {
+				if (!u.getNom().contains(nom)) {
+					res.remove(u);
+				}
+			}
+			if (prenom != null) {
+				if (!u.getPrenom().contains(prenom)) {
+					res.remove(u);
+				}
+			}
+			if (ville != null) {
+				if (!u.getAdresse().getVille().getNom().equals(ville.getNom())) {
+					res.remove(u);
+				}
+			}
+			if (profil != null) {
+				if (!u.getProfils().contains(profil)) {
+					res.remove(u);
+				}
 			}
 		}
 
