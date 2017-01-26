@@ -278,48 +278,19 @@ public class UtilisateursServices {
 		 * retournés sur différents critères: Nom (recherche du type
 		 * "contient"), Prénom (recherche du type "contient"), Ville, Profil.
 		 */
-
+		log.info("=====> avant la query");
 		Query query = entityManager.createQuery(
-				"SELECT * FROM utilisateur, ville, profils_utilisateurs "
-						+ "WHERE utilisateur.ville_codepostal = ville.code_postal "
-						+ "AND utilisateur.login = profils_utilisateur.login_utilisateur"
-						+ "AND LOWER(utilisateur.nom) REGEXP :custNom "
-						+ "AND LOWER(utilisateur.nom) REGEXP :custPrenom "
-						+ "AND LOWER(ville.nom) REGEXP :custVille "
-						+ "AND LOWER(profils_utilisateurs.profils) REGEXP :custProfil ");
-		if (nom != null) {
-			query = query.setParameter("custNom", "\'" + nom + "\'");
-		} else {
-			query = query.setParameter("custNom", "\'[a-z]\'");
+				"SELECT u FROM Utilisateur u ");
+
+		List<Utilisateur> res = (List<Utilisateur>) query.getResultList();
+		for (Utilisateur u : res) {
+			if (!u.getNom().contains(nom)) {
+
+			}
 		}
-		if (prenom != null) {
-			query = query.setParameter("custPrenom", "\'" + prenom + "\'");
-		} else {
-			query = query.setParameter("custPrenom", "\'[a-z]\'");
-		}
-		if (ville != null) {
-			query = query.setParameter("custVille", ville);
-		} else {
-			query = query.setParameter("custVille", "\'[a-z]\'");
-		}
-		if (profil != null) {
-			query = query.setParameter("custProfil", profil);
-		} else {
-			query = query.setParameter("custProfil", "\'[a-z]\'");
-		}
-		// query = query.setMaxResults(nombreItems);
 
 		/*
-		 * query = query.setParameter("custName", prenom); query =
-		 * query.setParameter("custName", ville); query =
-		 * query.setParameter("custName", profil); // query =
-		 * query.getResultList(); //
-		 * http://localhost:8080/utilisateurs/admin/list?json=nom=Michel&prenom=
-		 * Philippe=&ville=null&profil=UTILISATEUR&page=1&nombreItems=1 //
-		 * Exemple pour dire comment on renvoie tous les utilisateurs // Query
-		 * query = entityManager.createQuery("SELECT * FROM // Utilisateurs");
-		 * 
-		 * /** On indique dans la trace que la récupération de la liste s'est
+		 * On indique dans la trace que la récupération de la liste s'est
 		 * correctement réalisée.
 		 */
 		trace.setResultat("Liste des utilisateurs OK");
@@ -327,8 +298,7 @@ public class UtilisateursServices {
 				"Affichage de la liste des utilisateurs par l'utilisateur : "
 						+ demandeur.getLogin());
 
-		List<Utilisateur> res = (List<Utilisateur>) query.getResultList();
-		System.out.println(res);
+		log.info("=====> avant le return");
 		return res;
 	}
 
