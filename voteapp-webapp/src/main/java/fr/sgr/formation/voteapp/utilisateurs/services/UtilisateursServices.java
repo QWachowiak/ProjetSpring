@@ -141,11 +141,16 @@ public class UtilisateursServices {
 		}
 
 		log.info("=====> Suppression de l'utilisateur de login {}.", utilisateurSupprime.getLogin());
-		entityManager.detach(utilisateurSupprime);
+		entityManager.remove(utilisateurSupprime);
 		/*
-		 * Remarque: quand une instance d'Utilisateur est detach l'opération se
-		 * fait en cascade sur les éventuelle entity qui sont des attributs de
-		 * l'Utilisateur
+		 * .remove() the .remove() method takes elements out of the DOM. Use
+		 * .remove() when you want to remove the element itself, as well as
+		 * everything inside it. In addition to the elements themselves, all
+		 * bound events and jQuery data associated with the elements are
+		 * removed. .detach() The .detach() method is the same as .remove(),
+		 * except that .detach() keeps all jQuery data associated with the
+		 * removed elements. This method is useful when removed elements are to
+		 * be reinserted into the DOM at a later time.
 		 */
 	}
 
