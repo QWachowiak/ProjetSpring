@@ -1,6 +1,6 @@
 package fr.sgr.formation.voteapp.utilisateurs.ws;
 
-import java.util.List;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -78,7 +78,7 @@ public class UtilisateursRest {
 	}
 
 	@RequestMapping(value = "/liste", method = RequestMethod.GET)
-	public List<Utilisateur> afficher(@PathVariable String login,
+	public HashMap<Utilisateur, String> afficher(@PathVariable String login,
 			@RequestParam(value = "page") int page,
 			@RequestParam(value = "nbItems") int nombreItems,
 			@RequestParam(value = "prenom", required = false) String prenom,

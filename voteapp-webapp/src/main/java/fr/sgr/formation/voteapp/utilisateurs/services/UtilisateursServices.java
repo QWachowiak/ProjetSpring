@@ -1,6 +1,6 @@
 package fr.sgr.formation.voteapp.utilisateurs.services;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -289,7 +289,7 @@ public class UtilisateursServices {
 	 * @return Une page de la liste des utilisateurs correspondant aux critères
 	 * @throws DroitAccesException
 	 */
-	public List<Utilisateur> afficherPage(Utilisateur demandeur, String prenom, String nom, Ville ville,
+	public HashMap<Utilisateur, String> afficherPage(Utilisateur demandeur, String prenom, String nom, Ville ville,
 			ProfilsUtilisateur profil, int page,
 			int nombreItems) throws DroitAccesException {
 		/**
@@ -351,7 +351,7 @@ public class UtilisateursServices {
 		/*
 		 * Afficher seulement la page désirée avec le nombre d'items désirés
 		 */
-		List<Utilisateur> bonRes = new ArrayList();
+		HashMap<Utilisateur, String> bonRes = new HashMap();
 		int l = res.size();
 		if (nombreItems != 0) {
 			int quotient = l / nombreItems;
@@ -368,7 +368,8 @@ public class UtilisateursServices {
 				int indexDeb = (page - 1) * nombreItems;
 				int indexFin = indexDeb + nombreItems;
 				for (int i = indexDeb; i < indexFin; i++) {
-					bonRes.add(res.get(i));
+					String pp = Integer.valueOf(page).toString() + "/" + Integer.valueOf(nbPages).toString();
+					bonRes.put(res.get(i), pp);
 				}
 
 			} else {
