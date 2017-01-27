@@ -1,5 +1,6 @@
 package fr.sgr.formation.voteapp.utilisateurs.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -347,7 +348,38 @@ public class UtilisateursServices {
 				"Affichage de la liste des utilisateurs par l'utilisateur : "
 						+ demandeur.getLogin());
 
-		return res;
+		/*
+		 * Afficher seulement la page désirée avec le nombre d'items désirés
+		 */
+		List<Utilisateur> bonRes = new ArrayList();
+		int l = res.size();
+		if (nombreItems != 0) {
+			int quotient = l / nombreItems;
+			int nbPages = quotient;
+			int reste = l % nombreItems;
+			if (reste != 0) {
+				nbPages = nbPages + 1;
+			}
+			/*
+			 * Je ne veux garder que les utilisateurs dont l'index correspond à
+			 * la page demandée:
+			 */
+			if (page <= nbPages) {
+				int indexDeb = (page - 1) * nombreItems;
+				int indexFin = indexDeb + nombreItems;
+				for (int i = indexDeb; i < indexFin; i++) {
+					bonRes.add(res.get(i));
+				}
+
+			} else {
+				System.out.println("La page demandée n'existe pas.");
+			}
+
+		} else {
+			System.out.println("Division par zéro!");
+		}
+
+		return bonRes;
 	}
 
 }
