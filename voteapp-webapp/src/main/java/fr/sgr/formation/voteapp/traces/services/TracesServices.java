@@ -151,7 +151,12 @@ public class TracesServices {
 				}
 			}
 			if (dateDebut != null) {
-				if (!t.getDate().equals(dateDebut)) {
+				if (!t.getDate().after(dateDebut)) {
+					res.remove(t);
+				}
+			}
+			if (dateFin != null) {
+				if (!t.getDate().before(dateFin)) {
 					res.remove(t);
 				}
 			}
