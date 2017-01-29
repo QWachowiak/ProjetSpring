@@ -312,8 +312,8 @@ public class UtilisateursServices {
 				"SELECT u FROM Utilisateur u ");
 		/*
 		 * Etant donné que jpql utilise les noms des classes java mappées
-		 * comme @Entity les jointures son malaisées, on trie les résultats de
-		 * la requête globale avec java
+		 * comme @Entity les jointures son malaisées, on choisit de trier les
+		 * résultats de la requête globale avec java
 		 */
 		List<Utilisateur> res = (List<Utilisateur>) query.getResultList();
 		for (Utilisateur u : res) {
@@ -368,7 +368,10 @@ public class UtilisateursServices {
 				int indexDeb = (page - 1) * nombreItems;
 				int indexFin = indexDeb + nombreItems;
 				for (int i = indexDeb; i < indexFin; i++) {
-					String pp = Integer.valueOf(page).toString() + "/" + Integer.valueOf(nbPages).toString();
+					String pp = Integer.valueOf(bonRes.size() + 1).toString() + "/" + Integer.valueOf(l).toString()
+							+ " items et " + Integer.valueOf(page).toString() + "/"
+							+ Integer.valueOf(nbPages).toString()
+							+ " pages";
 					bonRes.put(res.get(i), pp);
 				}
 

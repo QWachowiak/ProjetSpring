@@ -1,6 +1,7 @@
 package fr.sgr.formation.voteapp.traces.services;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -106,7 +107,7 @@ public class TracesServices {
 	 * @throws DroitAccesException
 	 *             Levée si l'utilisateur n'est pas administrateur.
 	 */
-	public List<Trace> afficherPage(Utilisateur demandeur, String nom, String email,
+	public HashMap<Trace, String> afficherPage(Utilisateur demandeur, String nom, String email,
 			TypeAction typeAction, Date dateDebut, Date dateFin, int page,
 			int nombreItems) throws DroitAccesException {
 		/**
@@ -120,22 +121,87 @@ public class TracesServices {
 		}
 
 		/**
-		 * A faire
+		 * On doit pouvoir filtrer la liste des traces retournés sur différents
+		 * critères: Email utilisateur, Nom Utilisateur (recherche du type
+		 * "contient"), Type d'action, Période de la trace: Date de début et
+		 * Date de fin
 		 */
+		log.info("=====> Consultation d'une liste de traces");
+		Query query = entityManager.createQuery("SELECT t FROM Trace t ");
+		/*
+		 * Etant donné que jpql utilise les noms des classes java mappées
+		 * comme @Entity les jointures son malaisées, on choisit de trier les
+		 * résultats de la requête globale avec java
+		 */
+		List<Trace> res = (List<Trace>) query.getResultList();
+		for (Trace t : res) {
+			if (nom != null) {
+				if (!t.getUtilisateurOrigine().getNom().contains(nom)) {
+					res.remove(t);
+				}
+			}
+			if (email != null) {
+				if (!t.getUtilisateurOrigine().getEmail().equals(email)) {
+					res.remove(t);
+				}
+			}
+			if (typeAction != null) {
+				if (!t.getTypeAction().equals(typeAction)) {
+					res.remove(t);
+				}
+			}
+			if (dateDebut != null) {
+				if (!t.getDate().equals(dateDebut)) {
+					res.remove(t);
+				}
+			}
+		}
 
-		// Exemple pour dire comment on renvoie tous les utilisateurs
-		Query query = entityManager.createQuery("SELECT * FROM Trace");
-
-		/**
+		/*
 		 * On indique dans la trace que la récupération de la liste s'est
 		 * correctement réalisée.
 		 */
-		trace.setResultat("Liste des traces OK");
-		trace.setDescription(
-				"Affichage de la liste des traces par l'utilisateur : "
-						+ demandeur.getLogin());
+		/*
+		 * trace.setResultat("Liste des traces OK"); trace.setDescription(
+		 * "Affichage de la liste des utilisateurs par l'utilisateur : " +
+		 * demandeur.getLogin());
+		 */
+		/*
+		 * Afficher seulement la page désirée avec le nombre d'items désirés
+		 */
+		HashMap<Trace, String> bonRes = new HashMap();
+		int l = res.size();
+		if (nombreItems != 0) {
+			int quotient = l / nombreItems;
+			int nbPages = quotient;
+			int reste = l % nombreItems;
+			if (reste != 0) {
+				nbPages = nbPages + 1;
+			}
+			/*
+			 * Je ne veux garder que les utilisateurs dont l'index correspond à
+			 * la page demandée:
+			 */
+			if (page <= nbPages) {
+				int indexDeb = (page - 1) * nombreItems;
+				int indexFin = indexDeb + nombreItems;
+				for (int i = indexDeb; i < indexFin; i++) {
+					String pp = Integer.valueOf(bonRes.size() + 1).toString() + "/" + Integer.valueOf(l).toString()
+							+ " items et " + Integer.valueOf(page).toString() + "/"
+							+ Integer.valueOf(nbPages).toString()
+							+ " pages";
+					bonRes.put(res.get(i), pp);
+				}
 
-		return (List<Trace>) query.getResultList();
+			} else {
+				System.out.println("La page demandée n'existe pas.");
+			}
+
+		} else {
+			System.out.println("Division par zéro!");
+		}
+
+		return bonRes;
 	}
 
 }
