@@ -1,7 +1,7 @@
 package fr.sgr.formation.voteapp.traces.ws;
 
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,7 +32,7 @@ public class TracesRest {
 	private TracesServices tracesServices;
 
 	@RequestMapping(method = RequestMethod.GET)
-	public List<Trace> afficher(@PathVariable String login,
+	public HashMap<Trace, String> afficher(@PathVariable String login,
 			@RequestParam(value = "page") int page,
 			@RequestParam(value = "nbItems") int nombreItems,
 			@RequestParam(value = "nom", required = false) String nom,
@@ -40,7 +40,7 @@ public class TracesRest {
 			@RequestParam(value = "typeAction", required = false) TypeAction typeAction,
 			@RequestParam(value = "dateDebut", required = false) Date dateDebut,
 			@RequestParam(value = "dateFin", required = false) Date dateFin) throws DroitAccesException {
-		log.info("=====> Récupération d'une liste d'utilisateurs");
+		log.info("=====> Récupération d'une liste de traces");
 
 		return tracesServices.afficherPage(utilisateursServices.rechercherParLogin(login), nom, email,
 				typeAction, dateDebut, dateFin, page, nombreItems);

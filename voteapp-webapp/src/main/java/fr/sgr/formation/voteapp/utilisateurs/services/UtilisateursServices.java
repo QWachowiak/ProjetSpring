@@ -365,8 +365,14 @@ public class UtilisateursServices {
 			 * la page demandée:
 			 */
 			if (page <= nbPages) {
-				int indexDeb = (page - 1) * nombreItems;
+				int indexDeb = 0;
+				if (page != 1) {
+					indexDeb = (page - 1) * nombreItems;
+				}
 				int indexFin = indexDeb + nombreItems;
+				if (indexFin > l) {
+					indexFin = l;
+				}
 				for (int i = indexDeb; i < indexFin; i++) {
 					String pp = Integer.valueOf(bonRes.size() + 1).toString() + "/" + Integer.valueOf(l).toString()
 							+ " items et " + Integer.valueOf(page).toString() + "/"

@@ -114,7 +114,7 @@ public class TracesServices {
 		 * On commence par indiquer qu'une tentative d'affichage des
 		 * utilisateurs a lieu.
 		 */
-		Trace trace = init(demandeur, TypeAction.TR_CONSULT);
+		// Trace trace = init(demandeur, TypeAction.TR_CONSULT);
 
 		if (!demandeur.getProfils().contains(ProfilsUtilisateur.ADMINISTRATEUR)) {
 			throw new DroitAccesException(ErreurDroits.ACCES_ADMINISTRATEUR);
@@ -166,11 +166,11 @@ public class TracesServices {
 		 * On indique dans la trace que la récupération de la liste s'est
 		 * correctement réalisée.
 		 */
-		/*
-		 * trace.setResultat("Liste des traces OK"); trace.setDescription(
-		 * "Affichage de la liste des utilisateurs par l'utilisateur : " +
-		 * demandeur.getLogin());
-		 */
+		// trace.setResultat("Liste des traces OK");
+		// trace.setDescription(
+		// "Affichage de la liste des traces par l'utilisateur : " +
+		// demandeur.getLogin());
+
 		/*
 		 * Afficher seulement la page désirée avec le nombre d'items désirés
 		 */
@@ -188,8 +188,14 @@ public class TracesServices {
 			 * la page demandée:
 			 */
 			if (page <= nbPages) {
-				int indexDeb = (page - 1) * nombreItems;
+				int indexDeb = 0;
+				if (page != 1) {
+					indexDeb = (page - 1) * nombreItems;
+				}
 				int indexFin = indexDeb + nombreItems;
+				if (indexFin > l) {
+					indexFin = l;
+				}
 				for (int i = indexDeb; i < indexFin; i++) {
 					String pp = Integer.valueOf(bonRes.size() + 1).toString() + "/" + Integer.valueOf(l).toString()
 							+ " items et " + Integer.valueOf(page).toString() + "/"
