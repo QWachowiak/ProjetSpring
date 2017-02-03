@@ -351,7 +351,7 @@ public class UtilisateursServices {
 		/*
 		 * Afficher seulement la page désirée avec le nombre d'items désirés
 		 */
-		HashMap<Utilisateur, String> bonRes = new HashMap();
+		HashMap<Utilisateur, String> pageRecherchee = new HashMap();
 		int l = res.size();
 		if (nombreItems != 0) {
 			int quotient = l / nombreItems;
@@ -374,11 +374,12 @@ public class UtilisateursServices {
 					indexFin = l;
 				}
 				for (int i = indexDeb; i < indexFin; i++) {
-					String pp = Integer.valueOf(bonRes.size() + 1).toString() + "/" + Integer.valueOf(l).toString()
+					String pp = Integer.valueOf(pageRecherchee.size() + 1).toString() + "/"
+							+ Integer.valueOf(l).toString()
 							+ " items et " + Integer.valueOf(page).toString() + "/"
 							+ Integer.valueOf(nbPages).toString()
 							+ " pages";
-					bonRes.put(res.get(i), pp);
+					pageRecherchee.put(res.get(i), pp);
 				}
 
 			} else {
@@ -389,7 +390,7 @@ public class UtilisateursServices {
 			System.out.println("Division par zéro!");
 		}
 
-		return bonRes;
+		return pageRecherchee;
 	}
 
 }
