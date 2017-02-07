@@ -74,6 +74,23 @@ public class TracesServices {
 			trace.setDescription(
 					"Tentative de création d'une election, par l'utilisateur : " + utilisateurOrigine.getLogin());
 			break;
+		case ELEC_LISTE:
+			trace.setResultat("Affichage de la liste des elections en erreur.");
+			trace.setDescription(
+					"Tentative d'affichage de la liste des elections par l'utilisateur : "
+							+ utilisateurOrigine.getLogin());
+			break;
+		case ELEC_CLOTURE:
+			trace.setResultat("Cloture de l'election en erreur.");
+			trace.setDescription(
+					"Tentative de cloture de l'election par l'utilisateur : "
+							+ utilisateurOrigine.getLogin());
+			break;
+		case ELEC_MODIF:
+			trace.setResultat("Modification en erreur.");
+			trace.setDescription(
+					"Tentative de modification d'une election par l'utilisateur : " + utilisateurOrigine.getLogin());
+			break;
 		default:
 			break;
 		}

@@ -12,5 +12,6 @@ public enum TypeAction {
 	ELEC_MODIF,
 	ELEC_CONSULT,
 	ELEC_RECHERCHE,
+	ELEC_LISTE,
 	VOTE;
 }

@@ -37,5 +37,6 @@ public class Election {
 	private String titre;
 	private String description;
 	private String image;
+	private boolean cloture = false;
 
 }

@@ -27,7 +27,8 @@ public class ElectionInvalideException extends Exception {
 		UTILISATEUR_OBLIGATOIRE("L'utilisateur est obligatoire pour effectuer l'opération."),
 		TITRE_OBLIGATOIRE("Le titre de l'election est obligatoire."),
 		DESCRIPTION_OBLIGATOIRE("La description de l'election est obligatoire."),
-		ELECTION_EXISTANT("Une election de même id existe déjà sur le système.");
+		ELECTION_EXISTANT("Une election de même id existe déjà sur le système."),
+		GERANT_ORIGINE("Vous n'êtes pas le createur d'origine de l'election");
 
 		@Getter
 		public String message;

@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.sgr.formation.voteapp.election.modele.Election;
+import fr.sgr.formation.voteapp.election.services.ElectionInvalideException;
+import fr.sgr.formation.voteapp.election.services.ElectionServices;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Adresse;
 import fr.sgr.formation.voteapp.utilisateurs.modele.ProfilsUtilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
@@ -32,6 +35,8 @@ public class Initialisation {
 	private VilleService villeService;
 	@Autowired
 	private UtilisateursServices utilServ;
+	@Autowired
+	private ElectionServices elecServ;
 
 	@PostConstruct
 	@Transactional(propagation = Propagation.REQUIRED)
@@ -52,6 +57,7 @@ public class Initialisation {
 		admin.setEmail("quentin.wachowiak@wanadoo.fr");
 		Set<ProfilsUtilisateur> profils = new HashSet<ProfilsUtilisateur>();
 		profils.add(ProfilsUtilisateur.ADMINISTRATEUR);
+		profils.add(ProfilsUtilisateur.GERANT);
 		admin.setProfils(profils);
 		try {
 			utilServ.creer(admin, admin);
@@ -84,6 +90,26 @@ public class Initialisation {
 		try {
 			utilServ.creer(admin, user);
 		} catch (UtilisateurInvalideException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DroitAccesException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		// Création de la première election
+		Election electionUSA = new Election();
+		electionUSA.setTitre("Votez Trump");
+		electionUSA.setDescription("Vive Trump");
+		Calendar calendarDebut = Calendar.getInstance();
+		calendarDebut.set(2016, 7, 7);
+		Calendar calendarFin = Calendar.getInstance();
+		calendarFin.set(2016, 11, 8);
+		electionUSA.setDateDeDebut(calendarDebut.getTime());
+		electionUSA.setDateDeFin(calendarFin.getTime());
+		try {
+			elecServ.init(admin, electionUSA);
+		} catch (ElectionInvalideException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (DroitAccesException e) {
