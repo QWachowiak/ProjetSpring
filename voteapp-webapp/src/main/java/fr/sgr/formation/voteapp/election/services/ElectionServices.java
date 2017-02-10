@@ -42,6 +42,10 @@ public class ElectionServices {
 	public Election init(Utilisateur createur, Election nouvelleElection)
 			throws ElectionInvalideException, DroitAccesException {
 
+		if (createur == null) {
+			throw new ElectionInvalideException(ErreurElection.UTILISATEUR_OBLIGATOIRE);
+		}
+
 		/** On commence par indiquer qu'une tentative de création a lieu. */
 		Trace trace = tracesServices.init(createur, TypeAction.ELEC_CREATION);
 
@@ -49,9 +53,7 @@ public class ElectionServices {
 			throw new DroitAccesException(ErreurDroits.ACCES_GERANT);
 		}
 
-		if (createur == null) {
-			throw new ElectionInvalideException(ErreurElection.UTILISATEUR_OBLIGATOIRE);
-		}
+		nouvelleElection.setUtilisateurOrigine(createur);
 
 		/**
 		 * Validation de l'election: lève une exception si l'election est
@@ -88,8 +90,12 @@ public class ElectionServices {
 	 * @return Une page de la liste des elections correspondant aux critères
 	 * @throws DroitAccesException
 	 */
-	public HashMap<Utilisateur, String> afficherPage(Utilisateur demandeur, String titre, String description, int page,
+	public HashMap<Election, String> afficherPage(Utilisateur demandeur, String titre, String description, int page,
 			int nombreItems) throws DroitAccesException {
+		if (demandeur == null) {
+			throw new DroitAccesException(ErreurDroits.ACCES_GERANT);
+		}
+
 		/**
 		 * On commence par indiquer qu'une tentative d'affichage des elections a
 		 * lieu.
@@ -101,18 +107,14 @@ public class ElectionServices {
 		}
 
 		/**
-		 * L'utilisateur doit pouvoir filtrer la liste des elections retournés
+		 * L'utilisateur doit pouvoir filtrer la liste des elections retournées
 		 * sur différents critères: Titre (recherche du type "contient"),
 		 * Description (recherche du type "contient").
 		 */
 		log.info("=====> Consultation d'une liste d'elections");
 		Query query = entityManager.createQuery(
 				"SELECT e FROM Election e ");
-		/*
-		 * Etant donné que jpql utilise les noms des classes java mappées
-		 * comme @Entity les jointures son malaisées, on choisit de trier les
-		 * résultats de la requête globale avec java
-		 */
+
 		List<Election> res = (List<Election>) query.getResultList();
 		for (Election e : res) {
 			if (titre != null) {
@@ -139,7 +141,7 @@ public class ElectionServices {
 		/*
 		 * Afficher seulement la page désirée avec le nombre d'items désirés
 		 */
-		HashMap<Utilisateur, String> pageRecherchee = new HashMap();
+		HashMap<Election, String> pageRecherchee = new HashMap();
 		int l = res.size();
 		if (nombreItems != 0) {
 			int quotient = l / nombreItems;
@@ -167,7 +169,7 @@ public class ElectionServices {
 							+ " items et " + Integer.valueOf(page).toString() + "/"
 							+ Integer.valueOf(nbPages).toString()
 							+ " pages";
-					// pageRecherchee.put(res.get(i), pp);
+					pageRecherchee.put(res.get(i), pp);
 				}
 
 			} else {

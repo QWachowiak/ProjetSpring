@@ -136,23 +136,27 @@ public class UtilisateursServices {
 	 */
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void supprimer(Utilisateur suppresseur, Utilisateur utilisateurSupprime) throws DroitAccesException {
+		if (suppresseur == null) {
+			throw new DroitAccesException(ErreurDroits.ACCES_ADMINISTRATEUR);
+		}
+
+		Trace trace = tracesServices.init(suppresseur, TypeAction.USR_SUPPR);
 
 		if (!suppresseur.getProfils().contains(ProfilsUtilisateur.ADMINISTRATEUR)) {
 			throw new DroitAccesException(ErreurDroits.ACCES_ADMINISTRATEUR);
 		}
 
 		log.info("=====> Suppression de l'utilisateur de login {}.", utilisateurSupprime.getLogin());
-		entityManager.remove(utilisateurSupprime);
-		/*
-		 * .remove() the .remove() method takes elements out of the DOM. Use
-		 * .remove() when you want to remove the element itself, as well as
-		 * everything inside it. In addition to the elements themselves, all
-		 * bound events and jQuery data associated with the elements are
-		 * removed. .detach() The .detach() method is the same as .remove(),
-		 * except that .detach() keeps all jQuery data associated with the
-		 * removed elements. This method is useful when removed elements are to
-		 * be reinserted into the DOM at a later time.
+
+		/**
+		 * On indique dans la trace que la suppression s'est correctement
+		 * réalisée.
 		 */
+		trace.setResultat("Suppression OK");
+		trace.setDescription("Suppression de l'utilisateur de login " + utilisateurSupprime.getLogin()
+				+ " par l'administrateur de login " + suppresseur.getLogin());
+
+		entityManager.remove(utilisateurSupprime);
 	}
 
 	/**
@@ -292,6 +296,11 @@ public class UtilisateursServices {
 	public HashMap<Utilisateur, String> afficherPage(Utilisateur demandeur, String prenom, String nom, Ville ville,
 			ProfilsUtilisateur profil, int page,
 			int nombreItems) throws DroitAccesException {
+
+		if (demandeur == null) {
+			throw new DroitAccesException(ErreurDroits.ACCES_ADMINISTRATEUR);
+		}
+
 		/**
 		 * On commence par indiquer qu'une tentative d'affichage des
 		 * utilisateurs a lieu.

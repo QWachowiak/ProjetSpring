@@ -17,7 +17,6 @@ import fr.sgr.formation.voteapp.election.modele.Election;
 import fr.sgr.formation.voteapp.election.services.ElectionInvalideException;
 import fr.sgr.formation.voteapp.election.services.ElectionServices;
 import fr.sgr.formation.voteapp.traces.services.TracesServices;
-import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.services.DroitAccesException;
 import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateurInvalideException;
 import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateursServices;
@@ -46,40 +45,8 @@ public class ElectionRest {
 		electionServices.init(utilisateursServices.rechercherParLogin(login), election);
 	}
 
-	// @RequestMapping(method = RequestMethod.DELETE)
-	// public void supprimer(@PathVariable String login) {
-	// log.info("=====> Suppression de l'utilisateur de login {}.", login);
-	//
-	// }
-	//
-	// @RequestMapping(method = RequestMethod.GET)
-	// public Utilisateur lire(@PathVariable String login) {
-	// log.info("=====> Récupération de l'utilisateur de login {}.", login);
-	// tracesServices.init(utilisateursServices.rechercherParLogin(login),
-	// TypeAction.USR_CONSULT);
-	// return utilisateursServices.rechercherParLogin(login);
-	// }
-	//
-	// @RequestMapping(value = "/motDePasse", method = RequestMethod.GET)
-	// public void renouvellerMotdePasse(@PathVariable String login) throws
-	// Exception {
-	// log.info("=====> Envoi d'un nouveau mot de passe par mail à l'utilisateur
-	// de login : {}.", login);
-	// Trace trace =
-	// tracesServices.init(utilisateursServices.rechercherParLogin(login),
-	// TypeAction.USR_RENOUVMDP);
-	// String nouveauMdp = emailServices.genererMotDePasse();
-	// utilisateursServices.rechercherParLogin(login).setMotDePasse(nouveauMdp);
-	// emailServices.renouvellerMotDePasse(utilisateursServices.rechercherParLogin(login),
-	// nouveauMdp);
-	//
-	// /** Si l'email est passé, on met à jour la trace. */
-	// trace.setResultat("Renouvellement de mot de passe OK");
-	// }
-	//
-
 	@RequestMapping(value = "/liste", method = RequestMethod.GET)
-	public HashMap<Utilisateur, String> afficher(@PathVariable String login,
+	public HashMap<Election, String> afficher(@PathVariable String login,
 			@RequestParam(value = "page") int page,
 			@RequestParam(value = "nbItems") int nombreItems,
 			@RequestParam(value = "titre", required = false) String titre,

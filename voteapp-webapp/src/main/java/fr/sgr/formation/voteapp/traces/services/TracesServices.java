@@ -64,6 +64,10 @@ public class TracesServices {
 			trace.setDescription("Tentative d'affichage de la liste des utilisateurs par l'utilisateur : "
 					+ utilisateurOrigine.getLogin());
 			break;
+		case USR_SUPPR:
+			trace.setResultat("Suppression d'un utilisateur en erreur.");
+			trace.setDescription(
+					"Tentative de suppression d'un utilisateur par l'utilisateur : " + utilisateurOrigine.getLogin());
 		case TR_CONSULT:
 			trace.setResultat("Affichage de la liste des traces en erreur.");
 			trace.setDescription("Tentative d'affichage de la liste des traces par l'utilisateur : "

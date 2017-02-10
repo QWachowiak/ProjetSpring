@@ -2,21 +2,22 @@ package fr.sgr.formation.voteapp.utilisateurs.services;
 
 import static org.junit.Assert.fail;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.EntityManager;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import fr.sgr.formation.voteapp.notifications.services.NotificationsServices;
+import fr.sgr.formation.voteapp.traces.services.TracesServices;
 import fr.sgr.formation.voteapp.utilisateurs.modele.ProfilsUtilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
-import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateurInvalideException.ErreurUtilisateur;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UtilisateursServicesTest {
@@ -29,101 +30,57 @@ public class UtilisateursServicesTest {
 	@Mock
 	private NotificationsServices notificationsServices;
 	@Mock
+	private TracesServices tracesServices;
+	@Mock
+	private VilleService villeServices;
+	@Mock
 	private EntityManager entityManager;
 
-	@Mock
-	private Utilisateur admin;
-
 	@Test
-	public void creerUtilisateurNul() {
+	public void updateUtilisateurAdminNul() {
 		try {
-			admin.getProfils().add(ProfilsUtilisateur.ADMINISTRATEUR);
-			/** When: Lorsqu'on appel le service de création */
-			services.creer(admin, null);
+			/** Etant donnée une session d'administrateur ouverte. */
+			Utilisateur admin = new Utilisateur();
+
+			/** When: Lorsqu'on appelle le service de mise à jour. */
+			services.update(admin, null);
 
 			fail("Une exception devrait être levée.");
 		} catch (UtilisateurInvalideException e) {
-			/** Then: Alors une exception est levée. */
+			/** Then : Alors une exception est levée. */
 			Assert.assertEquals(UtilisateurInvalideException.ErreurUtilisateur.UTILISATEUR_OBLIGATOIRE, e.getErreur());
 		} catch (DroitAccesException e) {
-			// TODO Auto-generated catch block
 			fail("Une exception d'utilisateur invalide devrait être levée.");
 		}
 	}
 
 	@Test
-	public void creerVerificationExistanceUtilisateur() throws UtilisateurInvalideException {
-		/** Etant donné un utilsateur à créer. */
-		Utilisateur utilisateur = Utilisateur.builder().login(RandomStringUtils.random(10)).build();
-		/* Et que l'utilisateur existe sur le système */
-		UtilisateursServices spy = Mockito.spy(services);
-		Mockito.doReturn(utilisateur).when(spy).rechercherParLogin(utilisateur.getLogin());
-
+	public void updateUtilisateurNonAdmin() {
 		try {
-			/** Lorsqu'on appelle le service de création. */
-			spy.creer(utilisateur);
+			/**
+			 * Etant données une session d'utilisateur ouverte et un utilisateur
+			 * différent à créer/modifier.
+			 */
+			Utilisateur createur = new Utilisateur();
+			Utilisateur utilisateurAModifier = new Utilisateur();
 
+			/**
+			 * Lorsque la session en cours n'est pas celle d'un administrateur.
+			 */
+			Set<ProfilsUtilisateur> profils = new HashSet<ProfilsUtilisateur>();
+			profils.add(ProfilsUtilisateur.UTILISATEUR);
+			profils.add(ProfilsUtilisateur.GERANT);
+			createur.setProfils(profils);
+
+			/** When: Lorsqu'on appelle le service de mise à jour. */
+			services.update(createur, utilisateurAModifier);
 			fail("Une exception devrait être levée.");
 		} catch (UtilisateurInvalideException e) {
-			/**
-			 * Alors le service de vérification de l'existance de l'utilsiateur
-			 * est appelé.
-			 */
-			Mockito.verify(spy).rechercherParLogin(utilisateur.getLogin());
-
-			/* Et une exception est levée. */
-			Assert.assertEquals(UtilisateurInvalideException.ErreurUtilisateur.UTILISATEUR_EXISTANT, e.getErreur());
+			fail("Une exception de droits d'accès devrait être levée.");
+		} catch (DroitAccesException e) {
+			/** Then: Alors une exception est levée. */
+			Assert.assertEquals(DroitAccesException.ErreurDroits.ACCES_ADMINISTRATEUR, e.getErreur());
 		}
-	}
-
-	@Test
-	public void creerAppelValidationUtilisateur() throws UtilisateurInvalideException {
-		/** Etant donné un utilsateur à créer. */
-		Utilisateur utilisateur = new Utilisateur();
-
-		/** Lorsqu'on appelle le service de création. */
-		services.creer(utilisateur);
-
-		/** Alors le service de validation est appelé. */
-		Mockito.verify(validationServices).validerUtilisateur(utilisateur);
-	}
-
-	@Test
-	public void creerAppelValidationUtilisateurEnErreur() throws UtilisateurInvalideException {
-		/** Etant donné un utilsateur à créer. */
-		Utilisateur utilisateur = new Utilisateur();
-		/* Et un utilisateur invalide */
-		Mockito.when(validationServices.validerUtilisateur(utilisateur))
-				.thenThrow(new UtilisateurInvalideException(ErreurUtilisateur.MDP_OBLIGATOIRE));
-
-		try {
-			/** Lorsqu'on appelle le service de création. */
-			services.creer(utilisateur);
-
-			fail("Une exception est attendue.");
-		} catch (UtilisateurInvalideException e) {
-			/**
-			 * Alors le service de validation est appelé et l'exception est
-			 * propagée.
-			 */
-			Mockito.verify(validationServices).validerUtilisateur(utilisateur);
-
-			Assert.assertEquals(ErreurUtilisateur.MDP_OBLIGATOIRE, e.getErreur());
-		}
-	}
-
-	@Test
-	public void creerAppelNotification() throws UtilisateurInvalideException {
-		/** Etant donné un utilsateur à créer. */
-		Utilisateur utilisateur = Utilisateur.builder().login(RandomStringUtils.random(10)).build();
-		/* Qui n'existe pas en base */
-		Mockito.when(entityManager.find(Utilisateur.class, utilisateur.getLogin())).thenReturn(null);
-
-		/** Lorsqu'on appelle le service de création. */
-		services.creer(utilisateur);
-
-		/** Alors le service de notification est appelé. */
-		Mockito.verify(notificationsServices).notifier(Mockito.anyString());
 	}
 
 }
