@@ -1,7 +1,5 @@
 package fr.sgr.formation.voteapp.vote.services;
 
-import java.util.Date;
-
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.sgr.formation.voteapp.election.modele.Election;
 import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
 import fr.sgr.formation.voteapp.vote.modele.ValeurVote;
+import fr.sgr.formation.voteapp.vote.modele.Vote;
+import fr.sgr.formation.voteapp.vote.services.VoteInvalideException.ErreurVote;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -24,9 +24,10 @@ public class VotesServices {
 	 * @param votant
 	 * @param valeur
 	 * @param election
+	 * @throws VoteInvalideException
 	 */
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void creerVote(Utilisateur votant, ValeurVote valeur, Election election) {
+	public void creerVote(Utilisateur votant, ValeurVote valeur, Election election) throws VoteInvalideException {
 
 		/**
 		 * On commence par vérifier que "votant" est non null. Puis on crée une
@@ -40,38 +41,28 @@ public class VotesServices {
 
 		/** Vérification que le votant existe **/
 		if (votant == null) {
-			/** lance exception **/
+			throw new VoteInvalideException(ErreurVote.VOTANT_ABSENT);
 		}
 		/** Vérification que l'élection existe */
 		if (election == null) {
-			/** lance exception */
+			throw new VoteInvalideException(ErreurVote.ELECTION_INEXISTANTE);
 		}
 		/** Vérification que l'élection n'est pas cloturée **/
 		if (election.isCloture() == true) {
-			/** lance exception **/
+			throw new VoteInvalideException(ErreurVote.ELECTION_FERMEE);
 		}
 		/** Vérification que l'utilisateur n'a pas voté **/
 		if (election.getVotes().contains(votant) == true) {
-			/** lance exception **/
+			throw new VoteInvalideException(ErreurVote.VOTANT_DEJAVOTE);
 		}
 		/** Création du vote **/
+		Vote vote = new Vote();
+		vote.setUtilisateur(votant);
+		vote.setValeurvote(valeur);
+		election.getVotes().add(vote);
+		log.info("=====> L'utilisateur de login {} a voté pour l'élection d'id {}", votant.getLogin(),
+				election.getId());
 
-		Date today = new Date();
-		// on regarde si la date du jour est avant la date de fin de l'élection.
-		// Si l'élection n'existe pas, on devrait avoir une nullpointer
-		// exception
-		if (election.getDateDeFin().compareTo(today) > 0) { // voir la
-															// compatibilité
-															// entre date.util
-															// et
-															// temporaltype.date
-			// dans ce cas on ajoute le vote
-			election.getVotes().add(nouveauVote);
-			entityManager.persist(nouveauVote);
-			log.info("=====> A voté pour l'élection", election);
-		} else { // sinon pas de vote
-			log.info("=====> Tentative de vote pour une élection avortée");
-		}
 	}
 
 }
