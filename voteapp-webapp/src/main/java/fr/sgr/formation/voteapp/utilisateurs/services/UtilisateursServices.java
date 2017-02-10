@@ -137,7 +137,7 @@ public class UtilisateursServices {
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void supprimer(Utilisateur suppresseur, Utilisateur utilisateurSupprime) throws DroitAccesException {
 		if (suppresseur == null) {
-			throw new DroitAccesException(ErreurDroits.ACCES_ADMINISTRATEUR);
+			throw new DroitAccesException(ErreurDroits.ACCES_UTILISATEUR);
 		}
 
 		Trace trace = tracesServices.init(suppresseur, TypeAction.USR_SUPPR);

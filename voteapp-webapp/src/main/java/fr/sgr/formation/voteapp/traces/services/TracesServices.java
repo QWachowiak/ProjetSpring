@@ -95,6 +95,9 @@ public class TracesServices {
 			trace.setDescription(
 					"Tentative de modification d'une election par l'utilisateur : " + utilisateurOrigine.getLogin());
 			break;
+		case VOTE:
+			trace.setResultat("Vote en erreur.");
+			trace.setDescription("Tentative de vote de la part de l'utilisateur : " + utilisateurOrigine.getLogin());
 		default:
 			break;
 		}
@@ -131,6 +134,10 @@ public class TracesServices {
 	public HashMap<Trace, String> afficherPage(Utilisateur demandeur, String nom, String email,
 			TypeAction typeAction, Date dateDebut, Date dateFin, int page,
 			int nombreItems) throws DroitAccesException {
+
+		if (demandeur == null) {
+			throw new DroitAccesException(ErreurDroits.ACCES_UTILISATEUR);
+		}
 		/**
 		 * On commence par indiquer qu'une tentative d'affichage des
 		 * utilisateurs a lieu.

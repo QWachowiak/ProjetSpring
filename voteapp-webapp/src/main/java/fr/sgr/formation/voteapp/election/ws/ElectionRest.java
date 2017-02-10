@@ -21,6 +21,7 @@ import fr.sgr.formation.voteapp.utilisateurs.services.DroitAccesException;
 import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateurInvalideException;
 import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateursServices;
 import fr.sgr.formation.voteapp.utilisateurs.ws.DescriptionErreur;
+import fr.sgr.formation.voteapp.vote.modele.ValeurVote;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -56,6 +57,15 @@ public class ElectionRest {
 
 		return electionServices.afficherPage(utilisateursServices.rechercherParLogin(login), titre, description, page,
 				nombreItems);
+	}
+
+	@RequestMapping(value = "/resultats", method = RequestMethod.GET)
+	public HashMap<ValeurVote, Integer> afficherResultats(@PathVariable String login,
+			@RequestParam(value = "election") long idElection) throws DroitAccesException, ElectionInvalideException {
+		log.info("=====> Récupération des résultats d'une élection.");
+
+		return electionServices.afficherResultats(utilisateursServices.rechercherParLogin(login),
+				electionServices.rechercherParId(idElection));
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE)

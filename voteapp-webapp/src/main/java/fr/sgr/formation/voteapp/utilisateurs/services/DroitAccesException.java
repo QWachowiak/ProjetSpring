@@ -25,7 +25,8 @@ public class DroitAccesException extends Exception {
 	public enum ErreurDroits {
 		ACCES_ADMINISTRATEUR("L'utilisateur doit être un administrateur pour effectuer cette action."),
 		ACCES_GERANT("L'utilisateur doit être un gérant d'élection pour effectuer cette action."),
-		ACCES_PROPRIETAIRE("L'utilisateur doit être propriétaire de cette élection pour effectuer cette action.");
+		ACCES_PROPRIETAIRE("L'utilisateur doit être propriétaire de cette élection pour effectuer cette action."),
+		ACCES_UTILISATEUR("L'utilisateur doit exister sur le système pour effectuer une action. Sans blague !");
 
 		@Getter
 		public String message;

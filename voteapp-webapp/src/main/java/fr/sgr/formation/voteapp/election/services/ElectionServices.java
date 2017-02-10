@@ -21,6 +21,8 @@ import fr.sgr.formation.voteapp.utilisateurs.modele.Utilisateur;
 import fr.sgr.formation.voteapp.utilisateurs.services.DroitAccesException;
 import fr.sgr.formation.voteapp.utilisateurs.services.DroitAccesException.ErreurDroits;
 import fr.sgr.formation.voteapp.utilisateurs.services.UtilisateurInvalideException;
+import fr.sgr.formation.voteapp.vote.modele.ValeurVote;
+import fr.sgr.formation.voteapp.vote.modele.Vote;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -43,7 +45,7 @@ public class ElectionServices {
 			throws ElectionInvalideException, DroitAccesException {
 
 		if (createur == null) {
-			throw new ElectionInvalideException(ErreurElection.UTILISATEUR_OBLIGATOIRE);
+			throw new DroitAccesException(ErreurDroits.ACCES_UTILISATEUR);
 		}
 
 		/** On commence par indiquer qu'une tentative de création a lieu. */
@@ -93,7 +95,7 @@ public class ElectionServices {
 	public HashMap<Election, String> afficherPage(Utilisateur demandeur, String titre, String description, int page,
 			int nombreItems) throws DroitAccesException {
 		if (demandeur == null) {
-			throw new DroitAccesException(ErreurDroits.ACCES_GERANT);
+			throw new DroitAccesException(ErreurDroits.ACCES_UTILISATEUR);
 		}
 
 		/**
@@ -201,21 +203,25 @@ public class ElectionServices {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public Election cloture(Utilisateur createur, Election election)
+	public Election cloture(Utilisateur gerant, Election election)
 			throws ElectionInvalideException, DroitAccesException {
 
-		/** On commence par indiquer qu'une tentative de création a lieu. */
-		Trace trace = tracesServices.init(createur, TypeAction.ELEC_CLOTURE);
+		if (gerant == null) {
+			throw new DroitAccesException(ErreurDroits.ACCES_UTILISATEUR);
+		}
 
-		if (!createur.getProfils().contains(ProfilsUtilisateur.GERANT)) {
+		/** On commence par indiquer qu'une tentative de création a lieu. */
+		Trace trace = tracesServices.init(gerant, TypeAction.ELEC_CLOTURE);
+
+		if (!gerant.getProfils().contains(ProfilsUtilisateur.GERANT)) {
 			throw new DroitAccesException(ErreurDroits.ACCES_GERANT);
 		}
 
-		if (createur == null) {
+		if (gerant == null) {
 			throw new ElectionInvalideException(ErreurElection.UTILISATEUR_OBLIGATOIRE);
 		}
 
-		if (!createur.equals(election.getUtilisateurOrigine())) {
+		if (!gerant.equals(election.getUtilisateurOrigine())) {
 			throw new ElectionInvalideException(ErreurElection.GERANT_ORIGINE);
 		}
 
@@ -226,7 +232,7 @@ public class ElectionServices {
 		 */
 		trace.setResultat("Cloture OK");
 		trace.setDescription("Cloture de l'election d'id " + election.getId()
-				+ " par le gérant de login " + createur.getLogin());
+				+ " par le gérant de login " + gerant.getLogin());
 
 		return election;
 	}
@@ -251,6 +257,10 @@ public class ElectionServices {
 	@Transactional(propagation = Propagation.REQUIRED)
 	public Election modifier(Utilisateur modifiant, Election electionAModifier, Election modifications)
 			throws UtilisateurInvalideException, DroitAccesException, ElectionInvalideException {
+		if (modifiant == null) {
+			throw new DroitAccesException(ErreurDroits.ACCES_UTILISATEUR);
+		}
+
 		/** On commence par indiquer qu'une tentative de modification a lieu. */
 		Trace trace = tracesServices.init(modifiant, TypeAction.ELEC_MODIF);
 
@@ -309,5 +319,30 @@ public class ElectionServices {
 				+ " par le gérant de login " + modifiant.getLogin());
 
 		return electionAModifier;
+	}
+
+	@Transactional(propagation = Propagation.REQUIRED)
+	public HashMap<ValeurVote, Integer> afficherResultats(Utilisateur demandeur, Election election)
+			throws DroitAccesException, ElectionInvalideException {
+		if (demandeur == null) {
+			throw new DroitAccesException(ErreurDroits.ACCES_UTILISATEUR);
+		}
+
+		if (election == null) {
+			throw new ElectionInvalideException(ErreurElection.ELECTION_INEXISTANTE);
+		}
+
+		HashMap<ValeurVote, Integer> resultats = new HashMap<ValeurVote, Integer>();
+
+		for (Vote vote : election.getVotes()) {
+			ValeurVote valeur = vote.getValeurvote();
+			if (!resultats.containsKey(valeur)) {
+				resultats.put(valeur, 1);
+			} else {
+				resultats.put(valeur, resultats.get(valeur) + 1);
+			}
+		}
+
+		return resultats;
 	}
 }
